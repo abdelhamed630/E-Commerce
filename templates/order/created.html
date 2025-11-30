@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Order Confirmation | Complete Your Purchase{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+
+            {# --- Conditional Success Message Block --- #}
+            {% if success %}
+
+                <div class="alert alert-success p-4 mb-5 shadow-sm rounded-4 text-center" role="alert">
+                    <h2 class="alert-heading fw-bolder text-success">🎉 Order Placed Successfully!</h2>
+                    <p class="lead">Thank you for your purchase. Your order has been confirmed.</p>
+                    <hr>
+                    <p class="mb-0 fs-5">Your Order ID is: <strong class="text-primary">{{ order.order_id }}</strong></p>
+                    <p class="mt-2">Track your request using the ID.</p>
+                    <p class="mt-2">We send an email.</p>
+                </div>
+            {% endif %}
+            {# ------------------------------------------ #}
+
+            {# --- Order Details Card --- #}
+            <div class="card shadow-lg border-0 rounded-4 mb-5">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                    <h4 class="mb-0 fw-bold">🛒 Order Summary</h4>
+                </div>
+                <div class="card-body p-4 p-md-5">
+
+                    <h5 class="mb-4 pb-2 border-bottom fw-semibold text-primary">Items in Cart:</h5>
+                    
+                    <ul class="list-group list-group-flush mb-4">
+                        {% for item in cart %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div class="me-auto">
+                                    <span class="badge bg-secondary me-2">{{ item.quantity }}</span>
+                                    <span class="fw-medium">{{ item.product.name }}</span>
+                                </div>
+                                <span class="text-success fw-bold">${{ item.total_price }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    {# --- Total Price Row (Only visible if order is NOT successful) --- #}
+                    {% if not success %}
+                        <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-4">
+                            <h4 class="fw-bold mb-0 text-dark">Grand Total:</h4>
+                            <h4 class="text-danger fw-bolder mb-0">${{ cart.get_total_price }}</h4>
+                        </div>
+                    {% endif %}
+                    {# ------------------------------------------------------------------ #}
+                </div>
+            </div>
+            {# -------------------------- #}
+
+            {# --- Shipping Form Card (Only visible if order is NOT successful) --- #}
+            {% if not success %}
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-light text-center py-3 rounded-top-4">
+                        <h4 class="mb-0 fw-bold">🚚 Complete Your Order</h4>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        <p class="text-muted mb-4">Please fill out your shipping information to proceed with payment and confirm your purchase.</p>
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            
+                            <div class="text-center mt-5">
+                                <button type="submit" class="btn btn-primary btn-lg px-5 py-2 rounded-pill fw-bold shadow-sm">
+                                    Confirm & Place Order
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+            {# ------------------------------------------------------------------ #}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

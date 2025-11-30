@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+{% block title %} product_detail {% endblock title %}
+  <section class="product_details_section layout_padding">
+    <div class="container">
+      <div class="heading_container heading_center">
+        <h2>
+          Product Details
+        </h2>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="img-box">
+            <img src="{{product.image.url}}" alt="Product Name" class="img-fluid">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="detail-box">
+            <h4>{{product.name}}</h4>
+            <h5>
+              <span>$</span> {{product.price}}
+            </h5>
+            <p>
+              {{product.description}}           
+            </p>
+            <div class="star_container">
+              <i class="fa fa-star" aria-hidden="true"></i>
+              <i class="fa fa-star" aria-hidden="true"></i>
+              <i class="fa fa-star" aria-hidden="true"></i>
+              <i class="fa fa-star" aria-hidden="true"></i>
+              <i class="fa fa-star-half-o" aria-hidden="true"></i>
+            </div>
+            <div class="btn-box">
+              <form method="post" action="{% url 'cart:cart_add' product.id %}">
+                {% csrf_token %}
+                {{ cart_product_form }}
+                <button type="submit" class="btn btn-primary">
+                  Add to Cart
+                </button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- end product details section -->
+
+  <!-- info section -->
+  <section class="info_section ">
+    <!-- Include your existing footer code here -->
+  </section>
+  {% endblock content %}

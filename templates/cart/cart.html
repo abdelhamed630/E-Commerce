@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}سلة التسوق{% endblock %}
+
+{% block content %}
+<section class="cart_section layout_padding">
+    <div class="container">
+        <div class="heading_container heading_center">
+            <h2>سلة التسوق</h2>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="cart_items">
+                    <table class="table table-hover table-responsive-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">المنتج</th>
+                                <th scope="col">السعر</th>
+                                <th scope="col">الكمية</th>
+                                <th scope="col">الإجمالي</th>
+                                <th scope="col">إزالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-fluid mr-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                                        <span>{{ item.product.name }}</span>
+                                    </div>
+                                </td>
+                                <td>${{ item.price|floatformat:2 }}</td>
+                                <td>
+                                    <form method="post" action="{% url 'cart:cart_add' item.product.id %}" class="d-flex align-items-center">
+                                        {% csrf_token %}
+                                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm mr-2" style="width: 70px;">
+                                        <input type="hidden" name="override" value="True">
+                                        <button type="submit" class="btn btn-primary btn-sm">تحديث</button>
+                                    </form>
+                                </td>
+                                <td>${{ item.total_price|floatformat:2 }}</td>
+                                <td>
+                                    <form method="post" action="{% url 'cart:cart_remove' item.product.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">إزالة</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">سلة التسوق فارغة حالياً.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% if cart %}
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-right"><strong>المجموع الكلي للسلع:</strong></td>
+                                <td colspan="2"><strong>${{ cart.get_total_price|floatformat:2 }}</strong></td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card p-3 shadow-sm">
+                    <h4 class="card-title mb-3">ملخص الطلب</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            المجموع الكلي:
+                            <span>${{ cart.get_total_price|floatformat:2 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            الضريبة المقدرة:
+                            <span>7%</span>
+                        </li>
+
+                        {% if cart.coupon %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center text-success">
+                            الخصم ({{ cart.coupon.code }}) - {{ cart.coupon.discount }}%:
+                            <span>-${{ cart.get_discount|floatformat:2 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold bg-light">
+                            الإجمالي بعد الخصم:
+                            <span>${{ cart.get_total_price_after_discount|floatformat:2 }}</span>
+                        </li>
+                        {% else %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold bg-light">
+                            الإجمالي النهائي:
+                            <span>${{ cart.get_total_salary_after_tax|floatformat:2 }}</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+
+                    <form class="mt-4" action="{% url 'coupons:apply' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="{{ coupon_form.code.id_for_label }}">تطبيق كوبون الخصم:</label>
+                            {{ coupon_form.code }}
+                        </div>
+                        <button type="submit" class="btn btn-info btn-block">تطبيق الكوبون</button>
+                    </form>
+
+                    <a href="{% url 'orders:order_create' %}" class="btn btn-success mt-3 btn-block">إتمام الشراء</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

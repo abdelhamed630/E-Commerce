@@ -1,0 +1,43 @@
+<div class="message-container position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index:1050; width:50%;">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} shadow-lg text-center fade show" role="alert" style="transition: all 0.6s ease;">
+                <strong>
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                        خطأ:
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                        نجاح:
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+                        تنبيه:
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                        ملاحظة:
+                    {% endif %}
+                </strong>
+                {{ message }}
+                <button type="button" class="btn-close" aria-label="Close" 
+                        style="position:absolute; right:10px; top:8px; border:none; background:none; font-size:1.3rem;">&times;</button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // اغلاق يدوي عند الضغط على ×
+    document.querySelectorAll(".btn-close").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const alert = this.parentElement;
+            alert.style.opacity = "0";
+            setTimeout(() => alert.remove(), 500);
+        });
+    });
+
+    // اغلاق تلقائي بعد 4 ثواني
+    setTimeout(function() {
+        document.querySelectorAll(".alert").forEach(alert => {
+            alert.style.opacity = "0";
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 3000);
+});
+</script>
